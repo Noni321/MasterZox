@@ -49,6 +49,11 @@ export function AboutSection() {
               />
               
               <Avatar className="w-48 h-48 sm:w-56 sm:h-56 border-4 border-primary glow" data-testid="avatar-profile">
+                <img 
+                  src="/logo.jpg" 
+                  alt="Master Zox" 
+                  className="w-full h-full object-cover"
+                />
                 <AvatarFallback className="bg-card text-primary text-5xl sm:text-6xl font-bold">
                   MZ
                 </AvatarFallback>
