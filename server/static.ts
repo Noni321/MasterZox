@@ -3,12 +3,18 @@ import fs from "fs";
 import path from "path";
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(__dirname, "public");
+  // In production, built files are in dist/public
+  const distPath = path.resolve(__dirname, "..", "public");
+  
   if (!fs.existsSync(distPath)) {
+    console.error(`Build directory not found at: ${distPath}`);
+    console.error(`Current directory: ${__dirname}`);
     throw new Error(
       `Could not find the build directory: ${distPath}, make sure to build the client first`,
     );
   }
+  
+  console.log(`Serving static files from: ${distPath}`);
 
   app.use(express.static(distPath));
 
