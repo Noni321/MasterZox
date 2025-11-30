@@ -39,7 +39,6 @@ export async function setupVite(server: Server, app: Express) {
         import.meta.dirname,
         "..",
         "client",
-        "src",
         "index.html",
       );
 
