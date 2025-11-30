@@ -5,7 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Portfolio from "@/pages/Portfolio";
 import NotFound from "@/pages/not-found";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Volume2, VolumeX } from "lucide-react";
 
 function Router() {
   return (
@@ -18,34 +19,35 @@ function Router() {
 
 function App() {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    const playAudio = () => {
+    const tryAutoplay = async () => {
       if (audioRef.current) {
-        audioRef.current.play().catch((error) => {
-          console.log("Audio autoplay prevented:", error);
-        });
+        try {
+          await audioRef.current.play();
+          setIsPlaying(true);
+        } catch (error) {
+          console.log("Autoplay prevented - user interaction required");
+          setIsPlaying(false);
+        }
       }
     };
 
-    // Try to play immediately
-    playAudio();
-
-    // Also play on first user interaction
-    const handleInteraction = () => {
-      playAudio();
-      document.removeEventListener("click", handleInteraction);
-      document.removeEventListener("keydown", handleInteraction);
-    };
-
-    document.addEventListener("click", handleInteraction);
-    document.addEventListener("keydown", handleInteraction);
-
-    return () => {
-      document.removeEventListener("click", handleInteraction);
-      document.removeEventListener("keydown", handleInteraction);
-    };
+    tryAutoplay();
   }, []);
+
+  const toggleMusic = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        audioRef.current.play();
+        setIsPlaying(true);
+      }
+    }
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -53,6 +55,20 @@ function App() {
         <audio ref={audioRef} loop>
           <source src="/music.m4a" type="audio/mp4" />
         </audio>
+        
+        {/* Music Control Button */}
+        <button
+          onClick={toggleMusic}
+          className="fixed bottom-6 right-6 z-50 p-3 glass rounded-full glow-sm hover:glow transition-all duration-300"
+          aria-label={isPlaying ? "Pause music" : "Play music"}
+        >
+          {isPlaying ? (
+            <Volume2 className="w-6 h-6 text-primary" />
+          ) : (
+            <VolumeX className="w-6 h-6 text-muted-foreground" />
+          )}
+        </button>
+
         <Toaster />
         <Router />
       </TooltipProvider>
