@@ -6,31 +6,19 @@ interface LandingScreenProps {
 }
 
 const scrambleChars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const LANDING_COMPLETED_KEY = 'portfolio-landing-completed';
 
 export function LandingScreen({ onComplete }: LandingScreenProps) {
   const [currentWord, setCurrentWord] = useState('Continue');
   const [isAnimating, setIsAnimating] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [shouldShow, setShouldShow] = useState(true);
 
   useEffect(() => {
-    const completed = sessionStorage.getItem(LANDING_COMPLETED_KEY);
-    if (completed === 'true') {
-      setShouldShow(false);
-      onComplete();
-    }
-  }, [onComplete]);
-
-  useEffect(() => {
-    if (!shouldShow) return;
-    
     const interval = setInterval(() => {
       setShowCursor(prev => !prev);
     }, 530);
     return () => clearInterval(interval);
-  }, [shouldShow]);
+  }, []);
 
   const scrambleText = useCallback((targetWord: string, onScrambleComplete: () => void) => {
     const duration = 800;
@@ -62,7 +50,7 @@ export function LandingScreen({ onComplete }: LandingScreenProps) {
   }, []);
 
   const handleClick = useCallback(() => {
-    if (isAnimating || isTransitioning || !shouldShow) return;
+    if (isAnimating || isTransitioning) return;
 
     setIsAnimating(true);
     
@@ -70,13 +58,10 @@ export function LandingScreen({ onComplete }: LandingScreenProps) {
       setIsAnimating(false);
       setTimeout(() => {
         setIsTransitioning(true);
-        sessionStorage.setItem(LANDING_COMPLETED_KEY, 'true');
         setTimeout(onComplete, 800);
       }, 600);
     });
-  }, [isAnimating, isTransitioning, shouldShow, scrambleText, onComplete]);
-
-  if (!shouldShow) return null;
+  }, [isAnimating, isTransitioning, scrambleText, onComplete]);
 
   return (
     <AnimatePresence>
